@@ -21,8 +21,8 @@ public class BookCreateController {
         try {
             bookService.insert(book);
             return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body("Book created successfully");
+                .status(HttpStatus.CREATED)
+                .body("Book created successfully");
         } catch (Exception error) {
             throw new Error(error);
         }

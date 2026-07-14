@@ -17,7 +17,7 @@ public class BookInquiryDetailController {
     @GetMapping("/{id}")
     public ResponseEntity<Book> get(@PathVariable Long id) {
         return bookService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 }

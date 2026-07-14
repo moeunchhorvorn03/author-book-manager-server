@@ -32,4 +32,5 @@ public class Book {
     private boolean is_best_seller;
 
     private Long review;
+    
 }

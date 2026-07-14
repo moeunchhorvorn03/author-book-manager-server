@@ -8,10 +8,17 @@ import java.util.List;
 
 @Mapper
 public interface BookMapper {
+
     List<Book> findAll(BookDTO filter);
+
     List<Book> findByAuthorId(Long authorId);
+
     Book findById(Long id);
+
     void insert(Book book);
+
     void update(Book book);
+
     void delete(Long id);
+    
 }

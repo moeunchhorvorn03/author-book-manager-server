@@ -30,19 +30,17 @@ public class DataSourceConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
-        // Check if DATABASE_URL environment variable is set (Railway format)
+        
         String databaseUrl = System.getenv("DATABASE_URL");
         
         if (databaseUrl != null && !databaseUrl.isEmpty()) {
-            // Handle both postgresql:// and postgres:// formats
+            
             if (databaseUrl.startsWith("postgresql://") || databaseUrl.startsWith("postgres://")) {
                 try {
                     log.info("Detected DATABASE_URL environment variable");
                     
-                    // Parse Railway DATABASE_URL format: postgresql://user:password@host:port/database
                     URI dbUri = new URI(databaseUrl);
                     
-                    // Extract components
                     String host = dbUri.getHost();
                     int port = dbUri.getPort();
                     String path = dbUri.getPath();
@@ -50,20 +48,15 @@ public class DataSourceConfig {
                         path = path.substring(1); // Remove leading slash
                     }
                     
-                    // Build JDBC URL
                     String dbUrl = "jdbc:postgresql://" + host + ':' + port + '/' + path;
                     
-                    // Handle SSL mode for Railway
                     String query = dbUri.getQuery();
                     if (query != null && query.contains("sslmode")) {
                         dbUrl += "?" + query;
                     } else {
-                        // Railway databases typically require SSL
                         dbUrl += "?sslmode=require";
                     }
                     
-                    // Parse user info (format: username:password)
-                    // Handle URL-encoded passwords
                     String userInfo = dbUri.getUserInfo();
                     if (userInfo == null || userInfo.isEmpty()) {
                         throw new RuntimeException("DATABASE_URL missing user credentials");
@@ -73,11 +66,9 @@ public class DataSourceConfig {
                     String dbUsername = userInfoParts[0];
                     String dbPassword = userInfoParts.length > 1 ? userInfoParts[1] : "";
                     
-                    // Decode URL-encoded password if needed
                     try {
                         dbPassword = URLDecoder.decode(dbPassword, StandardCharsets.UTF_8.name());
                     } catch (Exception e) {
-                        // If decoding fails, use original password
                         log.warn("Could not decode password, using as-is");
                     }
                     
@@ -85,7 +76,6 @@ public class DataSourceConfig {
                     log.info("Database name: {}", path);
                     log.info("Username: {}", dbUsername);
                     
-                    // Use HikariCP for better connection management
                     HikariConfig config = new HikariConfig();
                     config.setJdbcUrl(dbUrl);
                     config.setUsername(dbUsername);
@@ -111,7 +101,6 @@ public class DataSourceConfig {
             }
         }
         
-        // Fall back to standard Spring Boot configuration (for local development)
         log.info("Using standard Spring Boot datasource configuration");
         
         if (datasourceUrl == null || datasourceUrl.isEmpty()) {
@@ -122,7 +111,6 @@ public class DataSourceConfig {
         log.info("Database URL: {}", datasourceUrl.replaceAll("password=[^&]*", "password=***"));
         log.info("Username: {}", username.isEmpty() ? "Not set" : username);
         
-        // Use HikariCP for better connection management
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(datasourceUrl);
         config.setUsername(username);

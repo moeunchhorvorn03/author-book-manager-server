@@ -21,4 +21,5 @@ public class BookInquiryController {
     public List<Book> searchBook(@RequestBody BookDTO filter) {
         return bookService.findAll(filter);
     }
+
 }

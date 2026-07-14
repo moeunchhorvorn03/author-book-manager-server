@@ -6,7 +6,6 @@ import com.example.Author.Book.Manager.dto.RegisterRequest;
 import com.example.Author.Book.Manager.model.User;
 import com.example.Author.Book.Manager.service.UserService;
 import com.example.Author.Book.Manager.util.JwtUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -26,14 +25,13 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             User user = new User();
             user.setUsername(request.getUsername());
             user.setEmail(request.getEmail());
             user.setPassword(request.getPassword());
             user.setRole(request.getRole());
-            // failed_login_attempts will default to 0 in the model
 
             User savedUser = userService.register(user);
 
@@ -52,18 +50,18 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace(); // Log the error for debugging
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Registration failed: " + e.getMessage());
+                .body("Registration failed: " + e.getMessage());
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
+                new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+                )
             );
 
             User user = (User) authentication.getPrincipal();
@@ -71,10 +69,10 @@ public class AuthController {
             String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
             AuthResponse response = new AuthResponse(
-                    token,
-                    user.getEmail(),
-                    user.getRole(),
-                    user.getUsername()
+                token,
+                user.getEmail(),
+                user.getRole(),
+                user.getUsername()
             );
 
             return ResponseEntity.ok(response);
